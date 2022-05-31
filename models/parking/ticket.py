@@ -6,7 +6,7 @@ class ReservationTicket:
         self.ticket_id = ticket_id #auto
         self.licence_no = licence_no
         self.parking_slot_id = parking_slot_id
-        self.ticket_status = TicketStatus.RESERVED # ticket status
+        self.ticket_status = TicketStatus.RESERVED.value
         self.hourly_price = hourly_price
         self.start_time = datetime.now()
         self.end_time = None

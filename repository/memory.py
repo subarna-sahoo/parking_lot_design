@@ -14,5 +14,5 @@ class DB:
         for ticket_id in self.ticket_table:
             ticket = self.ticket_table[ticket_id]
             if ticket.licence_no == inp_licence_no:
-                tickets.append(self.ticket_table[ticket])
+                tickets.append(ticket)
         return tickets

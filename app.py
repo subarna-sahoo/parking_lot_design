@@ -1,16 +1,11 @@
+from exception.api_response import ParkingServiceException
 from services.parking_service import ParkingService
 from models.payment.basic_payment import BasicPayment
 import connexion
 from flask import jsonify, request
+import json
 
 app = connexion.App(__name__, specification_dir="./")
-# app.add_api("swagger.yml")
-
-
-# CUT ---------------------------------
-# from response import SchemaValidationError, +MovieAlreadyExistsError, \
-# +InternalServerError, UpdatingMovieError, DeletingMovieError, +MovieNotExistsError
-# +
 
 service = ParkingService(10, payment=BasicPayment())
 
@@ -25,57 +20,68 @@ def root():
 @app.route('/vehicle/history', methods=['POST'])
 def get_vehicle_history():
     # GET /vehicle/history
-    data = request.get_json()
+    # GET /vehicle/history?licence_no=xyz
+    licence_no = request.args.get("licence_no", None)
     try:
-        resp = service.get_vehicle_history(data["licence_no"])
+        if licence_no:
+            resp = service.get_vehicle_history(licence_no)
+        else:
+            resp = service.get_all_vehicle_history()
+
         return {
             "message": "successful",
-            "tickets": resp
+            "tickets": [vehicle.__dict__ for vehicle in resp]
         }, 200
-
-    except Exception as message:
-        print(message)
+    except ParkingServiceException as e:
         return {
-            "message": "error"}, 400
+            "message": e.args[0]
+        }, 400
+    except Exception as e:
+        return {
+            "message": "general exception occured"
+        }, 500
 
 
-@app.route('/vehicle', methods=['POST'])
+@app.route('/vehicle/park', methods=['POST'])
 def park_vehicle():
     # POST /vehicle/park
     data = request.get_json()
     try:
         resp = service.get_ticket(data["licence_no"], data["contact_no"], data["vehicle_type"])
-        if (resp==None)
         return {
             "message": "successful",
-            "ticket_id": resp.ticket_id
+            "ticket": resp.__dict__
+        }, 200
+    except ParkingServiceException as e:
+        return {
+            "message": e.args[0]
+        }, 400
+    except Exception as e:
+        return {
+            "message": "general exception occured"
+        }, 500
+
+
+@app.route('/vehicle/checkout/<ticket_id>', methods=['PUT'])
+def checkout_vehicle(ticket_id):
+    # PUT /vehicle/checkout/:ticket_id
+    try:
+        resp = service.checkout_vehicle(ticket_id)
+        return {
+            "message": "successful",
+            "response": resp.__dict__
         }, 200
 
-    except Exception as message:
-        print(message)
+    except ParkingServiceException as e:
         return {
-            "message": "error"
+            "message": e.args[0]
         }, 400
+    except Exception as e:
+        return {
+            "message": "general exception occured"
+        }, 500
 
 
-# @app.route('/vehicle', methods=['GET', 'POST'])
-# def park_vehicle():
-#     # POST /vehicle/park
-#     data = request.get_json()
-#     try:
-#         resp = service.get_ticket(data["licence_no"], data["contact_no"], data["vehicle_type"])
-#         return {
-#             "message": "successful",
-#             "ticket_id": resp.ticket_id
-#         }, 200
-
-#     except Exception as message:
-#         print(message)
-#         return {
-#             "message": "error"
-#         }, 400
-
-# CUT ---------------------------------
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8001)
