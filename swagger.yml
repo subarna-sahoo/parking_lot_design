@@ -1,0 +1,53 @@
+swagger: "2.0"
+info:
+  description: "This is a Parkinglot System"
+  version: "1.0.0"
+  title: "ParkingLot System"
+host: "localhost:8000"
+basePath: "/"
+paths:
+  /:
+    get:
+      summary: "Check application health"
+      description: "Allows checking health of the appliction"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      produces:
+        - "application/xml"
+        - "application/json"
+      operationId: services.root
+      responses:
+        "200":
+          description: "GET request completed"
+  
+  # 
+  /sas:
+    put:
+      tags:
+        - "book"
+      summary: "Update an existing book"
+      description: "Update information of an existing book"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          name: "name"
+          type: "string"
+          description: "Name of the book"
+          required: true
+        - in: "query"
+          name: "description"
+          type: "string"
+          description: "Description of the book"
+          required: true
+      operationId: services.update_book
+      responses:
+        "200":
+          description: "Book information updated"
+        "404":
+          description: "Book doesn't exist"
