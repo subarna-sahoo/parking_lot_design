@@ -11,7 +11,6 @@ After successfully building the image, the next step is to run an instance of th
 `docker run -p 8000:8000 -d parking_lot_design`
 
 ## Pull the image from Docker
-<br>
 `docker pull subarnasahoo/parking_lot`
 
 ## Postman collection
